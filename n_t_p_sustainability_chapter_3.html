@@ -1,0 +1,1790 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ICAEW Sustainability — Chapter 3: Regulation relating to sustainability</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+
+    /* 3D Flashcard Flip Animation */
+    .perspective-1000 {
+      perspective: 1200px;
+    }
+    .transform-style-3d {
+      transform-style: preserve-3d;
+      transition: transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1);
+    }
+    .backface-hidden {
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+    .rotate-y-180 {
+      transform: rotateY(180deg);
+    }
+
+    /* Smooth Card Transition */
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-slide {
+      animation: fadeSlide 0.22s ease-out;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- ==================== STICKY HEADER ==================== -->
+  <header class="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <!-- Brand -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-600 flex items-center justify-center text-white font-extrabold text-sm shadow-sm shrink-0">
+          C3
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-bold text-slate-900 leading-tight">Chapter 3: Regulation relating to sustainability</h1>
+          <p class="text-xs text-slate-500">ICAEW Sustainability • 32 mục câu hỏi & 18 Flashcards</p>
+        </div>
+      </div>
+
+      <!-- 2 Main Navigation Tabs -->
+      <nav class="flex bg-slate-100 p-1 rounded-xl w-full sm:w-auto">
+        <button id="tab-quiz" onclick="switchTab('quiz')" class="flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-white text-emerald-700 shadow-sm">
+          Luyện tập / Kiểm tra
+        </button>
+        <button id="tab-flashcards" onclick="switchTab('flashcards')" class="flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all text-slate-600 hover:text-slate-900">
+          Flashcards ôn tập (18)
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <main class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-5 sm:py-7">
+
+    <!-- ==================== TAB 1: QUIZ CAROUSEL ==================== -->
+    <section id="view-quiz" class="space-y-4 sm:space-y-5">
+
+      <!-- Mode & Cycle Control Bar -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+        <!-- Mode Toggle -->
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Chế độ:</span>
+          <div class="inline-flex bg-slate-100 p-1 rounded-xl">
+            <button id="mode-practice" onclick="setQuizMode('practice')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-emerald-600 text-white shadow-sm">
+              Luyện tập (Hiện đáp án ngay)
+            </button>
+            <button id="mode-exam" onclick="setQuizMode('exam')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-600 hover:text-slate-900">
+              Kiểm tra (Nộp bài cuối chu kỳ)
+            </button>
+          </div>
+        </div>
+
+        <!-- Cycle & Quick Tools -->
+        <div class="flex flex-wrap items-center gap-2">
+          <span id="cycle-badge" class="px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-100">
+            Chu kỳ #1 (32 câu)
+          </span>
+          <button onclick="openFlaggedDrawer()" class="px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-semibold transition-colors flex items-center gap-1.5">
+            <span>Phân vân</span>
+            <span id="header-flag-count" class="px-1.5 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-bold">0</span>
+          </button>
+          <button onclick="openHistoryModal()" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors">
+            Lịch sử
+          </button>
+          <button onclick="startNewCycle(true)" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors">
+            ↻ Chu kỳ mới
+          </button>
+          <button id="btn-submit-exam" onclick="finishCycle()" class="hidden px-3.5 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold shadow-sm transition-colors">
+            Nộp bài
+          </button>
+        </div>
+      </div>
+
+      <!-- Progress, Accuracy & Navigator Trigger -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+        <div class="flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm mb-2.5">
+          <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+            <span class="font-semibold text-slate-700">
+              Tiến độ chu kỳ: <span id="progress-text" class="font-bold text-emerald-700">0 / 32 câu (0%)</span>
+            </span>
+            <span id="live-correct-badge" class="hidden px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
+              Đúng: 0
+            </span>
+            <span id="live-wrong-badge" class="hidden px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 text-xs font-bold border border-rose-200">
+              Sai: 0 (0%)
+            </span>
+          </div>
+          <button onclick="openNavigatorDrawer()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-semibold transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <span>Bảng câu hỏi</span>
+          </button>
+        </div>
+        <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+          <div id="progress-bar" class="h-full bg-gradient-to-r from-emerald-600 to-teal-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- Exam Graded Banner -->
+      <div id="exam-review-banner" class="hidden bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <p class="text-sm font-bold text-emerald-950">Đã chấm điểm bài kiểm tra!</p>
+          <p id="exam-review-stats" class="text-xs text-emerald-800 mt-0.5"></p>
+        </div>
+        <button onclick="openSummaryModal()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shrink-0 shadow-xs">
+          Xem bảng tổng kết
+        </button>
+      </div>
+
+      <!-- Carousel Question Card -->
+      <article id="question-card" class="bg-white rounded-3xl border border-slate-200 shadow-xs p-5 sm:p-8 animate-fade-slide">
+        <!-- Card Meta Row -->
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-5 pb-4 border-b border-slate-100">
+          <div class="flex flex-wrap items-center gap-2">
+            <span id="q-position" class="px-3 py-1 rounded-full bg-slate-900 text-white text-xs font-bold">Câu 1 / 32</span>
+            <span id="q-original-id" class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold">Q1</span>
+            <span id="q-lo-badge" class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-100">LO 3a</span>
+            <span id="q-type-badge" class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-semibold">Chọn 1 đáp án</span>
+          </div>
+
+          <!-- Flag Button -->
+          <button id="btn-flag" onclick="toggleFlagCurrent()" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border text-xs font-semibold transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+            <span id="btn-flag-text">Phân vân / Chọn lụi</span>
+          </button>
+        </div>
+
+        <!-- Scenario Context Box (hidden if empty) -->
+        <div id="q-context-wrap" class="mb-4 p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200/80">
+          <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Tình huống / Ngữ cảnh (Scenario)</p>
+          <p id="q-context" class="text-sm sm:text-[15px] text-slate-700 leading-relaxed whitespace-pre-line"></p>
+        </div>
+
+        <!-- Question Requirement -->
+        <div class="mb-6">
+          <p class="text-[11px] font-bold uppercase tracking-wider text-emerald-600 mb-1">Yêu cầu (Requirement)</p>
+          <h2 id="q-text" class="text-base sm:text-lg font-bold text-slate-900 leading-snug whitespace-pre-line"></h2>
+        </div>
+
+        <!-- Options List -->
+        <div id="q-options" class="space-y-3"></div>
+
+        <!-- Multi-choice Check Button (Practice Mode Only) -->
+        <div id="multi-check-wrap" class="hidden mt-5">
+          <button onclick="submitMultiPractice()" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold shadow-sm transition-colors">
+            Kiểm tra đáp án
+          </button>
+        </div>
+
+        <!-- Explanation Box -->
+        <div id="explanation-box" class="hidden mt-6 p-4 sm:p-5 rounded-2xl border">
+          <div class="flex flex-wrap items-center gap-2 mb-2.5">
+            <span id="exp-status-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold"></span>
+            <span class="text-xs font-semibold text-slate-500">Giải thích cốt lõi (ICAEW SOLUTION)</span>
+            <span id="exp-lo-tag" class="ml-auto px-2 py-0.5 rounded-md bg-white/80 text-emerald-700 text-[11px] font-bold border border-emerald-100"></span>
+          </div>
+          <p id="exp-correct-answer" class="text-xs sm:text-sm font-bold text-slate-900 mb-2"></p>
+          <p id="exp-text" class="text-sm text-slate-700 leading-relaxed whitespace-pre-line"></p>
+        </div>
+
+        <!-- Carousel Prev / Next Footer -->
+        <div class="mt-8 pt-5 border-t border-slate-100 flex items-center justify-between gap-3">
+          <button id="btn-prev" onclick="prevQuestion()" class="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 disabled:opacity-40 disabled:cursor-not-allowed text-slate-700 text-sm font-semibold transition-colors">
+            ← Câu trước
+          </button>
+          <span class="hidden sm:inline text-xs text-slate-400">Dùng phím ← / → để chuyển câu</span>
+          <button id="btn-next" onclick="nextQuestion()" class="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold shadow-sm transition-colors">
+            Câu tiếp →
+          </button>
+        </div>
+      </article>
+    </section>
+
+    <!-- ==================== TAB 2: FLASHCARDS ==================== -->
+    <section id="view-flashcards" class="hidden space-y-5">
+      <!-- Flashcard Controls Header -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div>
+          <h2 class="text-base font-bold text-slate-900">Flashcards ôn tập mỗi ngày — Chapter 3</h2>
+          <p class="text-xs text-slate-500">Chạm vào thẻ hoặc nhấn phím <kbd class="px-1.5 py-0.5 bg-slate-100 rounded border border-slate-300 text-[10px] font-bold">Space</kbd> để lật 3D</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="inline-flex bg-slate-100 p-1 rounded-xl">
+            <button id="fc-filter-all" onclick="setFlashcardFilter('all')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-emerald-700 shadow-sm">
+              Tất cả (<span id="fc-total-count">18</span>)
+            </button>
+            <button id="fc-filter-review" onclick="setFlashcardFilter('review')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600">
+              Cần ôn lại (<span id="fc-review-count">18</span>)
+            </button>
+            <button id="fc-filter-mastered" onclick="setFlashcardFilter('mastered')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600">
+              Đã nhớ (<span id="fc-mastered-count">0</span>)
+            </button>
+          </div>
+          <button onclick="shuffleFlashcards()" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors">
+            ↻ Xáo trộn
+          </button>
+        </div>
+      </div>
+
+      <!-- Mastery Progress Bar -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+        <div class="flex items-center justify-between text-xs sm:text-sm mb-2">
+          <span id="fc-position" class="font-bold text-slate-800">Thẻ 1 / 18</span>
+          <span id="fc-mastered-stats" class="font-bold text-emerald-700">Đã nhớ: 0 / 18 (0%)</span>
+        </div>
+        <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+          <div id="fc-progress-bar" class="h-full bg-gradient-to-r from-emerald-600 to-teal-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- 3D Flip Card -->
+      <div class="perspective-1000 w-full max-w-2xl mx-auto">
+        <div id="fc-card" onclick="flipFlashcard()" class="relative w-full min-h-[330px] sm:min-h-[370px] cursor-pointer transform-style-3d">
+          <!-- Front Face -->
+          <div class="absolute inset-0 backface-hidden bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-10 flex flex-col justify-between">
+            <div class="flex items-center justify-between gap-2">
+              <span id="fc-front-tag" class="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-100">FC1 • LO 3a</span>
+              <span id="fc-status-pill" class="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-500">Chưa đánh giá</span>
+            </div>
+            <div class="text-center my-auto py-4">
+              <p class="text-[11px] uppercase tracking-widest text-slate-400 font-bold mb-2">Khái niệm trọng tâm</p>
+              <h3 id="fc-front-text" class="text-xl sm:text-2xl font-extrabold text-slate-900 leading-snug"></h3>
+            </div>
+            <p class="text-center text-xs text-slate-400">Chạm vào thẻ để lật xem giải thích cốt lõi</p>
+          </div>
+
+          <!-- Back Face -->
+          <div class="absolute inset-0 backface-hidden rotate-y-180 bg-gradient-to-br from-emerald-700 to-teal-700 text-white rounded-3xl shadow-md p-6 sm:p-10 flex flex-col justify-between overflow-y-auto">
+            <div class="flex items-center justify-between gap-2">
+              <span class="px-3 py-1 rounded-full bg-white/15 text-white text-xs font-bold">Kiến thức cốt lõi</span>
+              <span id="fc-back-tag" class="text-xs text-emerald-100 font-semibold"></span>
+            </div>
+            <div class="my-auto py-3">
+              <p id="fc-back-text" class="text-sm sm:text-base leading-relaxed font-medium whitespace-pre-line"></p>
+            </div>
+            <p class="text-center text-xs text-emerald-200">Chạm để lật lại mặt trước</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Flashcard Action Bar -->
+      <div class="max-w-2xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 pt-1">
+        <button onclick="prevFlashcard()" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-sm font-semibold transition-colors">
+          ← Thẻ trước
+        </button>
+
+        <div class="flex items-center gap-2.5 w-full sm:w-auto justify-center">
+          <button onclick="markFlashcard('review')" class="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 text-sm font-semibold transition-colors">
+            Cần ôn lại
+          </button>
+          <button onclick="markFlashcard('mastered')" class="flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold shadow-sm transition-colors">
+            ✓ Đã nhớ
+          </button>
+        </div>
+
+        <button onclick="nextFlashcard()" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-sm font-semibold transition-colors">
+          Thẻ tiếp →
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== QUESTION NAVIGATOR DRAWER / MODAL ==================== -->
+  <div id="navigator-modal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4" onclick="if(event.target===this) closeNavigatorDrawer()">
+    <div class="bg-white rounded-t-3xl sm:rounded-3xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-xl animate-fade-slide">
+      <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+        <div>
+          <h3 class="text-base font-bold text-slate-900">Bảng câu hỏi (Chapter 3)</h3>
+          <p id="nav-modal-subtitle" class="text-xs text-slate-500 mt-0.5">Chọn số thứ tự để nhảy nhanh tới câu hỏi</p>
+        </div>
+        <button onclick="closeNavigatorDrawer()" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-sm flex items-center justify-center">✕</button>
+      </div>
+
+      <div class="px-5 pt-4 flex flex-wrap items-center gap-3 text-xs text-slate-600">
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-slate-200 inline-block"></span> Chưa làm</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-emerald-500 inline-block"></span> Đúng</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-rose-500 inline-block"></span> Sai</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-teal-500 inline-block"></span> Đã chọn (Thi)</span>
+        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span> Phân vân</span>
+      </div>
+
+      <div class="p-5 overflow-y-auto">
+        <div id="nav-grid" class="grid grid-cols-6 sm:grid-cols-8 gap-2"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== FLAGGED & WRONG QUESTIONS DRAWER ==================== -->
+  <div id="flagged-modal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4" onclick="if(event.target===this) closeFlaggedDrawer()">
+    <div class="bg-white rounded-t-3xl sm:rounded-3xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-xl animate-fade-slide">
+      <div class="p-5 border-b border-slate-100 flex items-center justify-between gap-3">
+        <div>
+          <h3 class="text-base font-bold text-slate-900">Câu hỏi Phân vân / Chọn lụi</h3>
+          <p class="text-xs text-slate-500 mt-0.5">Lưu bền vững trên trình duyệt để bạn ôn lại trước ngày thi</p>
+        </div>
+        <button onclick="closeFlaggedDrawer()" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-sm flex items-center justify-center">✕</button>
+      </div>
+
+      <div class="px-5 pt-4 flex flex-wrap items-center justify-between gap-2">
+        <span id="flagged-modal-count" class="text-xs font-bold text-amber-800">0 câu đã đánh dấu</span>
+        <div class="flex items-center gap-2">
+          <button id="btn-practice-flagged-modal" onclick="startFlaggedOnlyCycle()" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 disabled:opacity-40 text-white text-xs font-semibold shadow-xs transition-colors">
+            Luyện riêng câu phân vân
+          </button>
+        </div>
+      </div>
+
+      <div id="flagged-modal-list" class="p-5 overflow-y-auto space-y-3"></div>
+    </div>
+  </div>
+
+  <!-- ==================== CYCLE HISTORY MODAL ==================== -->
+  <div id="history-modal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4" onclick="if(event.target===this) closeHistoryModal()">
+    <div class="bg-white rounded-t-3xl sm:rounded-3xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-xl animate-fade-slide">
+      <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+        <div>
+          <h3 class="text-base font-bold text-slate-900">Lịch sử các chu kỳ ôn tập — Chapter 3</h3>
+          <p class="text-xs text-slate-500 mt-0.5">Theo dõi sự tiến bộ và tỷ lệ sai qua từng chu kỳ</p>
+        </div>
+        <button onclick="closeHistoryModal()" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-sm flex items-center justify-center">✕</button>
+      </div>
+
+      <div id="history-modal-body" class="p-5 overflow-y-auto"></div>
+
+      <div class="p-4 border-t border-slate-100 flex items-center justify-between">
+        <div id="reset-confirm-area">
+          <button onclick="showResetConfirm()" class="text-xs font-semibold text-rose-600 hover:text-rose-800 underline">
+            Đặt lại toàn bộ dữ liệu Chapter 3
+          </button>
+        </div>
+        <button onclick="closeHistoryModal()" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold">
+          Đóng
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== END-OF-CYCLE SUMMARY MODAL ==================== -->
+  <div id="summary-modal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4" onclick="if(event.target===this) closeSummaryModal()">
+    <div class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 sm:p-7 shadow-xl animate-fade-slide">
+      <div class="text-center mb-5">
+        <div class="w-14 h-14 mx-auto rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-2xl font-extrabold mb-3">
+          ✓
+        </div>
+        <h3 class="text-xl font-extrabold text-slate-900">Tổng kết chu kỳ</h3>
+        <p id="modal-cycle-subtitle" class="text-xs text-slate-500 mt-1"></p>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="grid grid-cols-2 gap-3 mb-5">
+        <div class="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-100 text-center">
+          <p class="text-xs text-emerald-700 font-medium">Điểm / Tỷ lệ đúng</p>
+          <p id="modal-correct" class="text-xl font-extrabold text-emerald-700 mt-0.5">0/32 (0%)</p>
+        </div>
+        <div class="p-3.5 rounded-2xl bg-rose-50 border border-rose-100 text-center">
+          <p class="text-xs text-rose-700 font-medium">Tỷ lệ sai</p>
+          <p id="modal-error-rate" class="text-2xl font-extrabold text-rose-600 mt-0.5">0%</p>
+        </div>
+        <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-center">
+          <p class="text-xs text-slate-600 font-medium">Số câu sai</p>
+          <p id="modal-wrong" class="text-xl font-bold text-slate-800 mt-0.5">0</p>
+        </div>
+        <div class="p-3.5 rounded-2xl bg-amber-50 border border-amber-100 text-center">
+          <p class="text-xs text-amber-700 font-medium">Phân vân / Chọn lụi</p>
+          <p id="modal-flagged" class="text-xl font-bold text-amber-700 mt-0.5">0</p>
+        </div>
+      </div>
+
+      <!-- Recent History Mini-Table -->
+      <div id="modal-history-preview" class="mb-5 p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70"></div>
+
+      <!-- Action Buttons -->
+      <div class="space-y-2.5">
+        <button onclick="startNewCycle(true)" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold shadow-sm transition-colors">
+          Bắt đầu chu kỳ mới (Xáo trộn toàn bộ 32 câu)
+        </button>
+        <button id="modal-btn-wrong-and-flagged" onclick="startWrongAndFlaggedCycle()" class="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold shadow-sm transition-colors">
+          Luyện riêng câu sai & phân vân
+        </button>
+        <button onclick="closeSummaryModal()" class="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold transition-colors">
+          Đóng & xem lại chi tiết từng câu
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="hidden fixed bottom-5 right-5 z-50 bg-slate-900 text-white text-xs sm:text-sm font-medium px-4 py-3 rounded-xl shadow-lg"></div>
+
+  <script>
+    // =========================================================================
+    // 1. COMPLETE VERIFIED QUESTION BANK — CHAPTER 3 (ALL 32 ITEMS, PDF-VERIFIED)
+    // =========================================================================
+    const QUESTIONS = [
+      {
+        id: "Q1", type: "single", lo: "LO 3a",
+        context: "Boruck SA (Boruck) has implemented a plan to reduce its water consumption by 20% within the next five years. Additionally, the government where Boruck operates has introduced a new law requiring businesses to submit quarterly reports on their water usage.",
+        question: "Which of the following correctly classifies Boruck's detailed plan and the government law?",
+        options: [
+          { key: "A", text: "The plan is a policy and the government law is a guideline" },
+          { key: "B", text: "The plan is a guideline and the government law is a policy" },
+          { key: "C", text: "The plan is a regulation and the government law is a guideline" },
+          { key: "D", text: "The plan is a policy and the government law is a regulation" }
+        ],
+        correct: ["D"],
+        explanation: "The plan to reduce water consumption by 20% within the next five years is a policy because it outlines what the company aims to achieve. The government's law requiring businesses to submit quarterly reports on water usage is a regulation because it is a legally binding requirement."
+      },
+      {
+        id: "Q2", type: "single", lo: "LO 3a",
+        context: "The government of EcoLand has provided voluntary guidelines to encourage companies to report on their sustainability practices and achievements. Despite this having been heavily publicised, only a few companies have implemented the guidelines.",
+        question: "What could the government of EcoLand do to ensure companies report on their sustainability practices and achievements?",
+        options: [
+          { key: "A", text: "Provide a free helpline to help companies implement the guidelines" },
+          { key: "B", text: "Introduce mandatory reporting regulations requiring all companies to provide sustainability disclosures" },
+          { key: "C", text: "Encourage governments of neighbouring countries to introduce guidelines on sustainability reporting for companies" },
+          { key: "D", text: "Set out a policy stating that all companies operating in EcoLand must work towards achieving the UN Sustainable Development Goals (SDGs)" }
+        ],
+        correct: ["B"],
+        explanation: "By introducing mandatory regulations (B), companies are legally required to participate, ensuring compliance. Providing a free helpline (A) lacks authority to effect change. Policies or guidelines of neighbouring countries (C) are unlikely to motivate compliance. Setting a policy on UN SDGs (D) is not relevant to reporting."
+      },
+      {
+        id: "Q3", type: "single", lo: "LO 3a",
+        context: "In an attempt to change attitudes or behaviour in relation to sustainability, policy, guidelines and regulation can be used.",
+        question: "Which of the following describes an advantage and disadvantage of regulation?",
+        options: [
+          { key: "A", text: "Advantage: explains simply the desired behaviour; Disadvantage: may lack detail to effect change" },
+          { key: "B", text: "Advantage: explains clearly how to implement a stated policy; Disadvantage: lacks authority so may be ignored" },
+          { key: "C", text: "Advantage: identifies clearly what is allowed and prohibited; Disadvantage: may lead to dysfunctional behaviour" },
+          { key: "D", text: "Advantage: promotes innovation in order to support policy; Disadvantage: may include ambiguity which could limit effectiveness" }
+        ],
+        correct: ["C"],
+        explanation: "Regulation is defined as any form of state interference with the operation of the free market. Advantages include identifying clearly what is allowed and prohibited, supporting compliant behaviour, and creating a fixed timeline. Disadvantages include additional compliance expense, possibilities of dysfunctional behaviour (eg, evading regulation), and favouring compliance over innovation. Policies are described in (A); guidelines are described in (B) and (D)."
+      },
+      {
+        id: "Q4", type: "multi", selectCount: 2, lo: "LO 3a, 3f",
+        context: "There is a trend towards regulations relating to sustainability rather than relying on policies and guidelines.",
+        question: "Which two of the following are drivers towards a trend from voluntary policies and guidance to mandatory regulations?",
+        options: [
+          { key: "A", text: "It is less expensive for companies to comply with regulations than policies or guidelines" },
+          { key: "B", text: "Mandatory regulations mean all companies across the world will be held accountable to the same extent" },
+          { key: "C", text: "Previous voluntary initiatives have not resulted in the progress required to enact change" },
+          { key: "D", text: "There is demand from stakeholders for companies to be more accountable and consistent in their reporting" }
+        ],
+        correct: ["C", "D"],
+        explanation: "The trend towards mandatory regulation rather than policies and guidelines has arisen from stakeholders, including investors, requiring companies to be held more accountable for their actions and to report consistently (D). A voluntary approach has not resulted in change being implemented quickly enough to address the urgent need (C)."
+      },
+      {
+        id: "Q5", type: "single", lo: "LO 3b",
+        context: "The United Nations Framework Convention on Climate Change (UNFCCC) secretariat is tasked with supporting the global response to the threat of climate change. It organises the annual meeting of the Conference of the Parties (COP) to the UNFCCC.",
+        question: "Which of the following actions best describes the role of the COP?",
+        options: [
+          { key: "A", text: "Developing national climate policies to support individual countries' sustainability initiatives" },
+          { key: "B", text: "Reviewing the implementation of the UNFCCC and agreeing upon collective actions to ensure its effective execution" },
+          { key: "C", text: "Producing comprehensive assessment reports of the science relating to climate change for use by the UNFCCC secretariat" },
+          { key: "D", text: "Providing investment to developing countries to finance UNFCCC projects that mitigate climate change" }
+        ],
+        correct: ["B"],
+        explanation: "The COP is the decision-making body of the UNFCCC comprising representatives from all member-state Parties. It reviews the implementation of the UNFCCC by reviewing emissions inventories submitted by each Party and agreeing actions to ensure effective execution (B). National policies are developed by individual governments (A), scientific assessment reports are produced by the IPCC (C), and financial support is provided by funds like the Green Climate Fund (D)."
+      },
+      {
+        id: "Q6", type: "single", lo: "LO 3b",
+        context: "The government of Bellenia, a developing country, is seeking financial support to implement a large-scale renewable energy project aimed at reducing greenhouse gas (GHG) emissions.",
+        question: "Which of the following international organisations may provide Bellenia with financial support for its renewable energy project?",
+        options: [
+          { key: "A", text: "The Green Climate Fund (GCF)" },
+          { key: "B", text: "The International Organisation for Standardisation (ISO)" },
+          { key: "C", text: "The United Nations Framework Convention on Climate Change (UNFCCC) secretariat" },
+          { key: "D", text: "The Intergovernmental Panel on Climate Change (IPCC)" }
+        ],
+        correct: ["A"],
+        explanation: "The Green Climate Fund (GCF) is the world's largest climate finance fund, established to support developing countries in combating climate change by providing financial resources and investment for sustainability initiatives including renewable energy projects (A). ISO sets standards (B), UNFCCC secretariat facilitates negotiations (C), and IPCC assesses scientific information (D)."
+      },
+      {
+        id: "Q7", type: "single", lo: "LO 3b",
+        context: "The government of the country of Arlandia is preparing to update its nationally determined contribution (NDC) under the Paris Agreement.",
+        question: "Which of the following correctly describes a nationally determined contribution (NDC)?",
+        options: [
+          { key: "A", text: "A policy document outlining a country's strategies for economic growth and development" },
+          { key: "B", text: "A report detailing the financial contributions a country will make to the Green Climate Fund" },
+          { key: "C", text: "A plan detailing a country's commitment to reduce greenhouse gas (GHG) emissions and adapt to climate impacts" },
+          { key: "D", text: "A comprehensive assessment of a country's biodiversity and natural resources" }
+        ],
+        correct: ["C"],
+        explanation: "Under the Paris Agreement, each country must prepare, communicate and maintain successive nationally determined contributions (NDCs) representing its efforts to reduce national GHG emissions and adapt to the impacts of climate change (C)."
+      },
+      {
+        id: "Q8", type: "single", lo: "LO 3b",
+        context: "The Kunming-Montréal Global Biodiversity Framework (the Framework) is an international agreement on biodiversity.",
+        question: "Which of the following targets are included in the Framework for urgent action by 2030?",
+        options: [
+          { key: "A", text: "Enhance global financial support for developing countries by 30%" },
+          { key: "B", text: "Limit global warming to well below 2°C above pre-industrial levels" },
+          { key: "C", text: "Increase the global use of pesticides in agriculture" },
+          { key: "D", text: "Restore 30% of all degraded ecosystems" }
+        ],
+        correct: ["D"],
+        explanation: "Adopted in 2022 under the UN Convention on Biological Diversity, the Kunming-Montréal Global Biodiversity Framework has 23 global targets for urgent action by 2030, including: restoring 30% of all degraded ecosystems (D), conserving 30% of land, waters and seas, reducing pollution to non-harmful levels, minimising climate impacts on biodiversity, and enhancing biodiversity in agriculture, aquaculture, fisheries and forestry. Limiting warming well below 2°C is the main goal of the Paris Agreement (B)."
+      },
+      {
+        id: "Q9", type: "multi", selectCount: 2, lo: "LO 3b",
+        context: "Vastralli SpA (Vastralli) is a food and drinks producer. It aims to align its operational strategy with the Kunming-Montréal Global Biodiversity Framework (the Framework).",
+        question: "Which two of the following are consistent with Vastralli aligning its operational strategy with the Framework?",
+        options: [
+          { key: "A", text: "Reducing the amount of water used in its production processes" },
+          { key: "B", text: "Providing sponsorship and support to a local community group" },
+          { key: "C", text: "Investing in and utilising energy-efficient equipment which will significantly reduce pollution levels" },
+          { key: "D", text: "Reporting on its greenhouse gas (GHG) emissions" },
+          { key: "E", text: "Removing the plants around its head office to provide electric car chargers for employees" }
+        ],
+        correct: ["A", "C"],
+        explanation: "Reducing water used in production aligns with the Framework target to conserve 30% of land, waters and seas (A). Investing in energy-efficient equipment that significantly reduces pollution aligns with reducing pollution to levels not harmful to biodiversity (C). Removing plants degrades the ecosystem (E), community sponsorship (B) and simply reporting GHG emissions (D) do not directly meet the Framework's biodiversity targets."
+      },
+      {
+        id: "Q10a", type: "single", lo: "LO 3c",
+        context: "Governments have an important role in driving sustainability change.",
+        question: "(Part 1 of 3) Identify whether the following is, or is not, a role of government in driving sustainability change:\n\"Educating the public on government policy relating to sustainability.\"",
+        options: [
+          { key: "A", text: "Role of government" },
+          { key: "B", text: "Not the role of government" }
+        ],
+        correct: ["A"],
+        explanation: "Education is an important role of government, including education relating to its overall sustainability policy and any initiatives in place to improve sustainability."
+      },
+      {
+        id: "Q10b", type: "single", lo: "LO 3c",
+        context: "Governments have an important role in driving sustainability change.",
+        question: "(Part 2 of 3) Identify whether the following is, or is not, a role of government in driving sustainability change:\n\"Provide financial support in the form of grants and tax incentives which support companies in their transition to more sustainable operations.\"",
+        options: [
+          { key: "C", text: "Role of government" },
+          { key: "D", text: "Not the role of government" }
+        ],
+        correct: ["C"],
+        explanation: "Government may provide funding (such as grants for energy-efficient assets) and tax incentives (such as allowing expenditure that supports sustainability initiatives) to encourage action."
+      },
+      {
+        id: "Q10c", type: "single", lo: "LO 3c",
+        context: "Governments have an important role in driving sustainability change.",
+        question: "(Part 3 of 3) Identify whether the following is, or is not, a role of government in driving sustainability change:\n\"Perform audits to validate the reporting of greenhouse gas emissions by companies.\"",
+        options: [
+          { key: "E", text: "Role of government" },
+          { key: "F", text: "Not the role of government" }
+        ],
+        correct: ["F"],
+        explanation: "Governments do not have an active role in validating or auditing the sustainability-related information disclosed by companies, including information about greenhouse gas emissions."
+      },
+      {
+        id: "Q11", type: "single", lo: "LO 3c",
+        context: "",
+        question: "What is the primary purpose of the European Union's (EU) Carbon Border Adjustment Mechanism (CBAM)?",
+        options: [
+          { key: "A", text: "To impose a carbon price on imports to the EU of certain goods to prevent carbon leakage" },
+          { key: "B", text: "To eliminate all tariffs and trade barriers for importers of low carbon goods" },
+          { key: "C", text: "To provide subsidies to EU-based companies that export low carbon goods outside the EU" },
+          { key: "D", text: "To replace the need for internal carbon trading systems within the EU" }
+        ],
+        correct: ["A"],
+        explanation: "The EU's Carbon Border Adjustment Mechanism (CBAM) is designed to prevent carbon leakage (A) by ensuring that the carbon price of imports is equivalent to the carbon price of goods made in the EU. Carbon leakage occurs when a company moves production to a country with less stringent climate policies to avoid associated costs. CBAM does not eliminate tariffs (B), provide subsidies (C), or replace internal trading systems (D)."
+      },
+      {
+        id: "Q12", type: "single", lo: "LO 3c",
+        context: "The European Union's (EU) Emissions Trading System (ETS) operates on a cap-and-trade principle.",
+        question: "Which of the following best describes the cap-and-trade principle of the EU's ETS?",
+        options: [
+          { key: "A", text: "Companies can capture and trade carbon emissions, but the total amount they can trade is capped" },
+          { key: "B", text: "Companies are awarded emission allowances up to a certain limit, but these cannot be traded" },
+          { key: "C", text: "Companies are given or buy emission allowances which they can trade, with a limit set on the total amount of emissions from all companies covered by the system" },
+          { key: "D", text: "Companies are allocated emission allowances which they can trade, and the cap on the allowances will rise over time" }
+        ],
+        correct: ["C"],
+        explanation: "The EU's Emissions Trading System (ETS) sets a cap on the total amount of certain GHGs that can be emitted by covered companies. Companies receive or buy emission allowances which they can trade with one another as needed (C). Importantly, the cap is reduced over time (not raised, so D is false) so that total emissions fall."
+      },
+      {
+        id: "Q13", type: "single", lo: "LO 3c",
+        context: "",
+        question: "Which of the following is an aim of the UK's Green Finance Strategy?",
+        options: [
+          { key: "A", text: "To regulate corporate tax rates for sustainable businesses" },
+          { key: "B", text: "To manage the national budget for all public sector investments" },
+          { key: "C", text: "To finance the implementation of sustainability education in schools" },
+          { key: "D", text: "To encourage private investments in low-carbon projects" }
+        ],
+        correct: ["D"],
+        explanation: "The UK's Green Finance Strategy aims to boost investment in climate projects by encouraging private investment in low-carbon and sustainable development projects (D). Managing the national budget, regulating corporate tax rates, and financing education are handled by the UK Treasury."
+      },
+      {
+        id: "Q14", type: "single", lo: "LO 3d",
+        context: "Heather Heroes is a non-governmental organisation (NGO) committed to the preservation and restoration of a rare wildlife habitat known as Heathlands. Its key focus is the education of local communities in the importance of maintaining Heathlands. It also lobbies the government for more work to be done to protect heathlands.",
+        question: "Which of the following is the best way of describing the role of Heather Heroes in driving sustainability change?",
+        options: [
+          { key: "A", text: "Advocacy and awareness of issues" },
+          { key: "B", text: "Research and data collection" },
+          { key: "C", text: "Capacity building" },
+          { key: "D", text: "Policy development and implementation" }
+        ],
+        correct: ["A"],
+        explanation: "Heather Heroes are advocating for Heathlands and raising awareness of their cause by educating local communities and lobbying government for change (A). They are not conducting their own research (B), capacity building (developing/strengthening skills and processes) (C), or directly developing policy (D)."
+      },
+      {
+        id: "Q15", type: "single", lo: "LO 3d",
+        context: "Activist groups often take radical action to raise awareness on climate change and other sustainability issues and influence both the general public and government policy. Examples include mass demonstrations and actions to disrupt traffic and sporting events.",
+        question: "Protests of this nature have often been criticised, so why do activist groups continue to use them?",
+        options: [
+          { key: "A", text: "They like getting the attention and publicity for themselves personally" },
+          { key: "B", text: "They do not care about people, only the planet" },
+          { key: "C", text: "They always try more conventional means of getting their point across first" },
+          { key: "D", text: "They believe that civilised and polite forms of action do not result in change" }
+        ],
+        correct: ["D"],
+        explanation: "Activist groups like Just Stop Oil and Extinction Rebellion undertake disruptive actions because they believe more conventional, civilised and polite methods do not result in change (D). They seek publicity for their cause rather than personal gain, and aim to preserve the planet for future generations."
+      },
+      {
+        id: "Q16", type: "multi", selectCount: 2, lo: "LO 3e",
+        context: "Non-governmental organisations (NGOs) play distinct roles in driving sustainability change compared with governments.",
+        question: "Which two of the following are roles of non-governmental organisations (NGOs) in driving sustainability change?",
+        options: [
+          { key: "A", text: "Implementing Carbon Reduction Plans (CRPs) for companies to report on how they will reduce their emissions" },
+          { key: "B", text: "Providing subsidies to companies to encourage them to adopt more sustainable business practices" },
+          { key: "C", text: "Creating emissions trading schemes for use by companies across the world" },
+          { key: "D", text: "Supporting the implementation of policy relating to sustainability" },
+          { key: "E", text: "Providing the skills and resources needed by communities to successfully adapt to a changing world" }
+        ],
+        correct: ["D", "E"],
+        explanation: "The four roles of NGOs in sustainability are: advocacy and awareness of issues, research and data collection, capacity building (providing skills and resources to communities — E), and policy development and implementation (D). Implementing Carbon Reduction Plans (A), providing subsidies (B), and creating emissions trading schemes (C) are roles of governments."
+      },
+      {
+        id: "Q17", type: "single", lo: "LO 3e, 4a",
+        context: "Vertix TechSpA (Vertix), a tech company, recently launched a sustainability initiative focusing on developing renewable energy technologies and promoting sustainable practices within its operations.",
+        question: "Which of the following is a way in which a business, like Vertix, can contribute to sustainability change?",
+        options: [
+          { key: "A", text: "Providing global financial support for other sustainability projects" },
+          { key: "B", text: "Issuing guidelines on sustainable energy use to governments" },
+          { key: "C", text: "Collecting and reporting on international energy-use data" },
+          { key: "D", text: "Using innovation and technology to drive change in the energy sector" }
+        ],
+        correct: ["D"],
+        explanation: "Vertix is focusing on developing new technologies to promote sustainability, using innovation and technology to drive change in the energy sector (D). Providing global financial support (A), issuing guidelines to governments (B), and collecting international data (C) are typically roles of governments and international organisations."
+      },
+      {
+        id: "Q18", type: "single", lo: "LO 3f",
+        context: "The government of Arlandia has introduced mandatory sustainability-related regulation for companies. The regulation requires all companies to set and make progress on targets to reduce greenhouse gas (GHG) emissions, energy usage and waste production. The new regulation replaces the previously used voluntary guidelines on these areas which were less prescriptive.",
+        question: "Which of the following is a reason why the government of Arlandia has chosen to move from voluntary sustainability guidelines to mandatory regulation?",
+        options: [
+          { key: "A", text: "To ensure consistent and enforceable standards across all companies, thereby addressing sustainability challenges more effectively" },
+          { key: "B", text: "To shift the financial burden of sustainability from government to large corporations, to ensure fairness" },
+          { key: "C", text: "To reduce the role of international organisations, such as the United Nations (UN), in sustainability efforts" },
+          { key: "D", text: "To make voluntary initiatives irrelevant as they are not effective in addressing the sustainability challenges" }
+        ],
+        correct: ["A"],
+        explanation: "The move to codified mandatory regulation aims to standardise sustainability efforts, providing enforceability and consistency across all companies that voluntary guidelines may lack (A)."
+      },
+      {
+        id: "Q19", type: "single", lo: "LO 3e, 4a",
+        context: "ABC Corp (ABC) is a leading global education business. ABC holds contracts with large multinational corporations to deliver training to their employees. ABC's learning materials are widely used by other educational institutes around the world.",
+        question: "Which of the following actions by ABC will have the greatest effect in improving sustainability in the education industry?",
+        options: [
+          { key: "A", text: "Providing all training materials electronically and being the first training provider to go truly paperless" },
+          { key: "B", text: "Voluntarily reporting on its environmental, social and governance (ESG) initiatives in its annual report" },
+          { key: "C", text: "Making a commitment to reach net zero by 2040 and widely publicising this on social media" },
+          { key: "D", text: "Encouraging its employees to use paid volunteering days for environmental projects (eg, litter picking)" }
+        ],
+        correct: ["A"],
+        explanation: "Providing only electronic learning materials to its own students as well as other educational businesses encourages others to use less paper, conserving natural resources. ABC is leading by example and driving industry-wide sustainability change (A). Reporting ESG (B), publicising a net-zero target (C), and employee volunteering (D) are responsible practices but will not transform sustainability across the whole education industry."
+      },
+      {
+        id: "Q20", type: "multi", selectCount: 3, lo: "LO 3e, 4a",
+        context: "Businesses undertake a broad range of sustainability-related activities that drive sustainability change. Many of these activities go beyond what they are legally required to do.",
+        question: "Which three of the following are activities that a business may undertake to drive sustainability change?",
+        options: [
+          { key: "A", text: "Engaging with stakeholders to understand their priorities and concerns" },
+          { key: "B", text: "Lobbying against sustainability-related regulatory change imposed by government" },
+          { key: "C", text: "Developing innovative solutions to sustainability challenges" },
+          { key: "D", text: "Sourcing goods from the cheapest suppliers without consideration of the suppliers' business practices" },
+          { key: "E", text: "Developing and promoting policies relating to sustainability issues" }
+        ],
+        correct: ["A", "C", "E"],
+        explanation: "Businesses can drive sustainability change by engaging with stakeholders to understand impacts and dependencies (A), innovating and developing technology to address challenges (C), and developing/promoting sustainability policies within their own business, industry or wider society (E). Lobbying against regulation (B) and sourcing purely from the cheapest suppliers (D) undermine sustainability."
+      },
+      {
+        id: "Q21", type: "single", lo: "LO 3f",
+        context: "The following statements have been made regarding the trends in sustainability guidance and regulation in recent years:\n(1) There has been a trend from voluntary guidance to mandatory regulation.\n(2) There has been an increase in international sustainability regulation to increase consistency across the world.\n(3) Sustainability guidance and regulation primarily relates to climate change due to the urgent need for action in this area.",
+        question: "Which of the statements are correct?",
+        options: [
+          { key: "A", text: "1 only" },
+          { key: "B", text: "1 and 2 only" },
+          { key: "C", text: "2 and 3 only" },
+          { key: "D", text: "1, 2 and 3" }
+        ],
+        correct: ["D"],
+        explanation: "All three statements are correct (D). Governments and international organisations have moved from voluntary guidelines to mandatory regulation to drive faster change; sustainability is a global issue requiring coordinated international consistency; and while climate change has been the primary focus (eg, Paris Agreement, IFRS Sustainability Disclosure Standards), other areas like biodiversity (Kunming-Montréal Framework) are also progressing."
+      },
+      {
+        id: "Q22", type: "multi", selectCount: 2, lo: "LO 3f",
+        context: "There is a recent trend away from sustainability guidelines towards more codified sustainability regulation.",
+        question: "Which two of the following are reasons behind the trend towards sustainability regulation?",
+        options: [
+          { key: "A", text: "To encourage innovation in addressing sustainability-related issues" },
+          { key: "B", text: "To reduce the expense incurred by businesses in ensuring compliance" },
+          { key: "C", text: "To promote more consistency in the actions of businesses and the information they report" },
+          { key: "D", text: "To respond to stakeholder pressure for businesses to be more accountable and transparent" },
+          { key: "E", text: "To push the responsibility and cost of climate change to future generations" }
+        ],
+        correct: ["C", "D"],
+        explanation: "The trend from voluntary guidelines to mandatory regulation responds to stakeholder demands for greater accountability and transparency (D) and promotes consistency in business actions and reporting (C). Regulation often discourages innovation (A), adds compliance expense (B), and forces current generations—not future ones—to bear responsibility (E)."
+      },
+      {
+        id: "Q23", type: "single", lo: "LO 3e",
+        context: "The directors of SmartP, a technology company, would like to find out more about the responsibility of business in relation to sustainability. They have heard of the term 'ESG', but do not know what it stands for.",
+        question: "What does ESG stand for?",
+        options: [
+          { key: "A", text: "Ecological, social and governance" },
+          { key: "B", text: "Environmental, social and governance" },
+          { key: "C", text: "Environmental, sustainability and governance" },
+          { key: "D", text: "Ecological, sustainability and green" }
+        ],
+        correct: ["B"],
+        explanation: "ESG stands for environmental, social and governance (B). ESG approaches sustainability issues through a corporate lens—more limited than the broader definition of sustainability—providing a framework for stakeholders and investors to assess how a business manages risks and opportunities relating to E, S and G matters."
+      },
+      {
+        id: "Q24", type: "multi", selectCount: 2, lo: "LO 3a",
+        context: "A policy is a statement of desired position that an individual, group, entity or even society should take on a particular subject.",
+        question: "Which two of the following are disadvantages of policies?",
+        options: [
+          { key: "A", text: "Favours compliance over innovation" },
+          { key: "B", text: "May lack the detail and/or authority required in order to effect change" },
+          { key: "C", text: "Can lead to dysfunctional behaviour" },
+          { key: "D", text: "May discriminate against certain parties unless carefully worded" },
+          { key: "E", text: "Can sometimes have a different effect to that desired" }
+        ],
+        correct: ["B", "E"],
+        explanation: "Policies are simple explanations of desired behaviour but may lack the detail of guidance or the authority of mandatory regulation to effect change (B), and can sometimes have an unintended effect different from that desired (E — eg, energy efficiency leading people to use more energy). Options A, C, and D are disadvantages of regulation."
+      },
+      {
+        id: "Q25", type: "single", lo: "LO 3e, 4a",
+        context: "DrinkDo GmbH (DrinkDo), a large multinational beverage company, wishes to demonstrate its commitment to sustainability.",
+        question: "Which of the following initiatives would not help DrinkDo to become more sustainable?",
+        options: [
+          { key: "A", text: "Switching to low-energy lightbulbs in all its properties" },
+          { key: "B", text: "A commitment to gender equality across its global operations and encouraging suppliers to do the same" },
+          { key: "C", text: "Ceasing to stock fair trade products due to customer demand for cheaper products" },
+          { key: "D", text: "Establishing robust sustainability targets and reporting on progress towards them on its company website each quarter" }
+        ],
+        correct: ["C"],
+        explanation: "Despite customer demand for cheaper products, ceasing to stock Fairtrade products (C) would not help DrinkDo become more sustainable. Businesses must balance shareholder wealth with stakeholder demands and ethical/sustainability responsibilities."
+      },
+      {
+        id: "Q26", type: "multi", selectCount: 2, lo: "LO 3e, 4a",
+        context: "Tlihp plc (Tlihp), a multinational corporation in the energy sector, is committed to transforming its business model to become more sustainable and reduce its carbon footprint. The board of directors is considering various strategic initiatives to embed sustainability into the core operations of the company.",
+        question: "Which two of the following could the directors include in their strategy that will directly help Tlihp become more sustainable?",
+        options: [
+          { key: "A", text: "Incorporating sustainability performance targets into the pay structure of senior management" },
+          { key: "B", text: "Setting the purchasing department a target to decrease procurement costs by 10% year on year" },
+          { key: "C", text: "Launching a campaign on social media to inform the public of Tlihp's commitment to becoming more sustainable" },
+          { key: "D", text: "Requiring all employees to attend training on sustainability" },
+          { key: "E", text: "Committing to increase the dividend payable to shareholders" }
+        ],
+        correct: ["A", "D"],
+        explanation: "Incorporating sustainability performance targets into senior management pay directly motivates leadership to embed sustainability into decisions (A). Requiring all employees to attend sustainability training builds awareness and capability to execute operational changes (D). Cutting procurement costs by 10% (B) risks unethical cheap sourcing, social media campaigns (C) are not substantive action, and higher dividends (E) encourage short-term profit focus."
+      },
+      {
+        id: "Q27", type: "single", lo: "LO 3g",
+        context: "Vall plc (Vall) is a large UK company that is required to comply with the UK's Streamlined Energy and Carbon Reporting (SECR) framework. This framework mandates the disclosure of certain greenhouse gas emissions and energy usage for large companies.",
+        question: "What specific categories of greenhouse gas (GHG) emissions must Vall disclose under the SECR framework?",
+        options: [
+          { key: "A", text: "Scope 1 only" },
+          { key: "B", text: "Scope 1 and 2 only" },
+          { key: "C", text: "Scope 2 and 3 only" },
+          { key: "D", text: "Scope 1, 2 and 3" }
+        ],
+        correct: ["D"],
+        explanation: "Under the UK's Streamlined Energy and Carbon Reporting (SECR) framework, large companies like Vall are required to disclose GHG emissions across all three scopes (D):\n• Scope 1: Direct emissions created by the business.\n• Scope 2: Indirect emissions from the generation of purchased energy.\n• Scope 3: All other indirect emissions across the value chain (suppliers and customers' use of products)."
+      },
+      {
+        id: "Q28", type: "multi", selectCount: 3, lo: "LO 3e, 4a",
+        context: "The directors of AET SA (AET), a clothing manufacturer and retailer, are aware that the company has a responsibility to protect the environment, including reducing emissions and conserving limited resources.",
+        question: "Which three of the following are ways in which AET can demonstrate its commitment to fulfilling its environmental responsibility?",
+        options: [
+          { key: "A", text: "Invest in new equipment which will reduce the levels of waste water in its manufacturing processes" },
+          { key: "B", text: "Set an emissions target for its production plant and have its progress validated by the Science-Based Target initiative (SBTi)" },
+          { key: "C", text: "Commit to removing young workers from its supply chain" },
+          { key: "D", text: "Provide its employees with one day of paid leave per annum to volunteer in the local community" },
+          { key: "E", text: "Change its logistics partner from one that uses diesel-fuelled vehicles to one that uses electric vehicles" }
+        ],
+        correct: ["A", "B", "E"],
+        explanation: "Investing in equipment to reduce waste water (A), setting emissions targets validated by an external body like SBTi (B), and switching to an electric vehicle logistics partner (E) directly demonstrate environmental responsibility. Removing young workers (C) and paid community volunteering leave (D) relate to social responsibility."
+      },
+      {
+        id: "Q29", type: "single", lo: "LO 3e, 4a",
+        context: "",
+        question: "Which of the following is an example of a business's social responsibility?",
+        options: [
+          { key: "A", text: "Reducing greenhouse gas emissions" },
+          { key: "B", text: "Promoting diversity and inclusion" },
+          { key: "C", text: "Reducing water usage" },
+          { key: "D", text: "Generating returns for shareholders" }
+        ],
+        correct: ["B"],
+        explanation: "Social responsibility involves actions such as ensuring fair labour practices and promoting diversity and inclusion (B). Reducing GHG emissions (A) and water usage (C) are environmental responsibilities, while generating returns (D) is a responsibility to shareholders."
+      },
+      {
+        id: "Q30", type: "multi", selectCount: 2, lo: "LO 3e, 4a",
+        context: "Beena SE (Beena), a manufacturing company, wants to make its supply chains more sustainable, but the directors are unsure how to do so.",
+        question: "Which two of the following will enable Beena to improve the sustainability of its supply chains?",
+        options: [
+          { key: "A", text: "Buying only from the cheapest suppliers and donating savings to an environmental charity" },
+          { key: "B", text: "Using suppliers that have public anti-corruption policies in place" },
+          { key: "C", text: "Requiring all suppliers to adhere to fair labour practices" },
+          { key: "D", text: "Insisting suppliers sign a confidentiality agreement, to ensure company processes are not used by competitors" },
+          { key: "E", text: "Using a wide range of suppliers to reduce reliance on any one supplier" }
+        ],
+        correct: ["B", "C"],
+        explanation: "Sustainable supply chains require suppliers and distributors to adopt sustainable practices, achieved by requiring compliance with rules on human rights, fair labour (C), environment, and anti-corruption (B) and monitoring adherence. Buying from the cheapest suppliers (A), confidentiality agreements (D), and overly complex/wide supplier networks (E) do not improve supply chain sustainability."
+      }
+    ];
+
+    // =========================================================================
+    // 2. 18 HIGH-YIELD FLASHCARDS — CHAPTER 3
+    // =========================================================================
+    const FLASHCARDS = [
+      {
+        id: "FC1", tag: "LO 3a",
+        front: "Policy vs. Guideline vs. Regulation",
+        back: "• Policy: Tuyên bố mục tiêu/hành vi mong muốn (đơn giản) → Nhược: thiếu chi tiết/thẩm quyền, đôi khi gây hiệu ứng ngược ngoài ý muốn.\n• Guideline: Hướng dẫn cụ thể cách thực thi policy, khuyến khích đổi mới → Nhược: tự nguyện (thiếu thẩm quyền nên dễ bị phớt lờ), có thể mơ hồ.\n• Regulation: Can thiệp pháp lý bắt buộc của nhà nước (nêu rõ được phép & bị cấm, có hạn chót) → Nhược: tốn chi phí tuân thủ, có thể gây hành vi đối phó (dysfunctional behaviour), ưu tiên tuân thủ hơn đổi mới."
+      },
+      {
+        id: "FC2", tag: "LO 3a, 3f",
+        front: "Drivers: Voluntary Guidance → Mandatory Regulation",
+        back: "Tại sao có xu hướng chuyển từ tự nguyện sang quy định bắt buộc?\n1. Các sáng kiến tự nguyện trước đây KHÔNG tạo ra tiến bộ đủ nhanh để giải quyết khủng hoảng cấp bách.\n2. Áp lực từ các bên liên quan (stakeholders, nhà đầu tư) đòi hỏi doanh nghiệp phải minh bạch, chịu trách nhiệm giải trình (accountable) và báo cáo nhất quán (consistent).\n3. Quy định mang lại tiêu chuẩn đồng nhất và có tính cưỡng chế (enforceable)."
+      },
+      {
+        id: "FC3", tag: "LO 3b",
+        front: "UNFCCC & COP vs. IPCC",
+        back: "• UNFCCC: Hiệp ước quốc tế về biến đổi khí hậu (khung đàm phán cho Paris Agreement).\n• COP (Conference of the Parties): Cơ quan ra quyết định cao nhất của UNFCCC — họp thường niên để RÀ SOÁT việc thực thi UNFCCC (xem kiểm kê phát thải) và THỐNG NHẤT hành động chung.\n• IPCC: Cơ quan đánh giá khoa học và lập báo cáo khoa học về biến đổi khí hậu (KHÔNG phải việc của COP)."
+      },
+      {
+        id: "FC4", tag: "LO 3b",
+        front: "Green Climate Fund (GCF) vs. ISO",
+        back: "• Green Climate Fund (GCF): Quỹ tài chính khí hậu lớn nhất thế giới — cung cấp nguồn vốn và đầu tư hỗ trợ các nước ĐANG PHÁT TRIỂN thực hiện dự án giảm phát thải (như năng lượng tái tạo).\n• ISO (International Organisation for Standardisation): Ban hành các tiêu chuẩn (vd: quản lý môi trường) — KHÔNG cung cấp tài trợ tài chính."
+      },
+      {
+        id: "FC5", tag: "LO 3b",
+        front: "Paris Agreement & NDCs",
+        back: "• Paris Agreement: Mục tiêu chính là giới hạn mức nóng lên toàn cầu dưới 2°C (hướng tới 1.5°C) so với thời kỳ tiền công nghiệp.\n• NDCs (Nationally Determined Contributions): Kế hoạch cam kết quốc gia của từng nước về việc giảm phát thải khí nhà kính (GHG) và thích ứng với tác động biến đổi khí hậu (không phải báo cáo đóng góp tài chính cho GCF)."
+      },
+      {
+        id: "FC6", tag: "LO 3b",
+        front: "Kunming-Montréal Global Biodiversity Framework (2022)",
+        back: "Thuộc Công ước Liên Hợp Quốc về Đa dạng sinh học, gồm 23 mục tiêu khẩn cấp đến năm 2030:\n• Phục hồi (Restore) 30% các hệ sinh thái bị suy thoái.\n• Bảo tồn (Conserve) 30% đất liền, vùng nước và biển (vd: giảm tiêu thụ nước sản xuất).\n• Giảm ô nhiễm xuống mức không gây hại cho đa dạng sinh học.\n• Giảm tác động biến đổi khí hậu lên đa dạng sinh học & tăng tính bền vững nông/lâm/ngư nghiệp."
+      },
+      {
+        id: "FC7", tag: "LO 3c",
+        front: "Role of Governments (DO vs. DON'T)",
+        back: "Chính phủ LÀM:\n• Ban hành luật/quy định, thuế carbon, ETS, Carbon Reduction Plans.\n• Giáo dục công chúng về chính sách bền vững.\n• Hỗ trợ tài chính qua trợ cấp (grants), ưu đãi thuế (tax incentives), trợ giá (subsidies).\n\n⚠️ BẪY THI — Chính phủ KHÔNG LÀM:\n• KHÔNG trực tiếp thực hiện kiểm toán/xác thực (perform audits to validate) báo cáo phát thải GHG của doanh nghiệp!"
+      },
+      {
+        id: "FC8", tag: "LO 3c",
+        front: "EU CBAM & Carbon Leakage",
+        back: "• EU CBAM (Carbon Border Adjustment Mechanism): Đánh giá/áp giá carbon lên hàng hóa nhập khẩu vào EU tương đương hàng sản xuất trong EU.\n• Mục đích chính: Ngăn chặn Carbon Leakage (rò rỉ carbon) — tình trạng doanh nghiệp chuyển nhà máy sang nước có quy định khí hậu lỏng lẻo hơn để né chi phí carbon.\n(CBAM KHÔNG bãi bỏ thuế quan, KHÔNG trợ cấp xuất khẩu, KHÔNG thay thế ETS)."
+      },
+      {
+        id: "FC9", tag: "LO 3c",
+        front: "EU ETS — Cap-and-Trade Principle",
+        back: "• Cap (Trần): Đặt giới hạn tổng lượng GHG tối đa mà tất cả doanh nghiệp trong hệ thống được phép phát thải.\n• Trade (Giao dịch): Doanh nghiệp được cấp hoặc mua hạn ngạch phát thải (emission allowances) và CÓ THỂ mua bán lại cho nhau.\n⚠️ Lưu ý bẫy: Trần (Cap) sẽ GIẢM DẦN theo thời gian (reduced over time — KHÔNG tăng) để tổng phát thải đi xuống."
+      },
+      {
+        id: "FC10", tag: "LO 3c",
+        front: "UK Green Finance Strategy",
+        back: "Mục tiêu cốt lõi: Thúc đẩy đầu tư vào các dự án khí hậu bằng cách khuyến khích ĐẦU TƯ TƯ NHÂN (private investments) vào các dự án ít carbon và phát triển bền vững.\n\n(Không phải để điều tiết thuế doanh nghiệp, quản lý ngân sách quốc gia hay tài trợ giáo dục — đó là việc của Bộ Tài chính Anh / UK Treasury)."
+      },
+      {
+        id: "FC11", tag: "LO 3d, 3e",
+        front: "4 Roles of NGOs in Sustainability",
+        back: "1. Advocacy and awareness: Vận động hành lang chính phủ & nâng cao nhận thức/giáo dục cộng đồng.\n2. Research and data collection: Nghiên cứu và thu thập dữ liệu.\n3. Capacity building: Cung cấp kỹ năng, nguồn lực giúp cộng đồng thích ứng với thế giới đang thay đổi.\n4. Policy development and implementation: Hỗ trợ xây dựng và thực thi chính sách bền vững."
+      },
+      {
+        id: "FC12", tag: "LO 3d",
+        front: "Activist Groups (Just Stop Oil, Extinction Rebellion)",
+        back: "Tại sao các nhóm hoạt động cực đoan vẫn biểu tình gây gián đoạn giao thông, sự kiện thể thao dù bị chỉ trích?\n→ Vì họ tin rằng các hình thức hành động ôn hòa, lịch sự (civilised and polite forms of action) KHÔNG mang lại sự thay đổi thực sự.\n(Mục đích là tạo chú ý cho mục tiêu chung/thế hệ tương lai, không phải vì lợi ích cá nhân)."
+      },
+      {
+        id: "FC13", tag: "LO 3e, 4a",
+        front: "How Businesses Drive Sustainability Change",
+        back: "Doanh nghiệp thúc đẩy thay đổi bền vững bằng cách:\n• Đổi mới sáng tạo và phát triển công nghệ (vd: năng lượng tái tạo).\n• Dẫn đầu làm gương (leading by example — vd: tiên phong chuyển đổi 100% không giấy tờ trong ngành giáo dục).\n• Tham vấn các bên liên quan (stakeholder engagement) để hiểu ưu tiên & rủi ro.\n• Xây dựng và lan tỏa chính sách bền vững trong nội bộ và toàn ngành."
+      },
+      {
+        id: "FC14", tag: "LO 3e",
+        front: "ESG (Environmental, Social, Governance)",
+        back: "• Viết tắt của: Environmental, Social and Governance.\n• Khác biệt: ESG hẹp hơn khái niệm Sustainability nói chung vì tiếp cận bền vững qua LĂNG KÍNH DOANH NGHIỆP (corporate lens).\n• Công dụng: Cung cấp khung thước đo (metrics/benchmark) giúp nhà đầu tư và các bên liên quan đánh giá cách doanh nghiệp quản trị rủi ro và cơ hội về E, S và G."
+      },
+      {
+        id: "FC15", tag: "LO 3g",
+        front: "UK SECR Framework — Scope 1, 2 & 3",
+        back: "Streamlined Energy and Carbon Reporting (SECR) yêu cầu doanh nghiệp lớn tại Anh công bố CẢ 3 PHẠM VI (Scope 1, 2 và 3):\n• Scope 1: Phát thải trực tiếp do doanh nghiệp tạo ra.\n• Scope 2: Phát thải gián tiếp từ việc sản xuất năng lượng/điện mà doanh nghiệp mua vào.\n• Scope 3: Toàn bộ phát thải gián tiếp khác trong chuỗi giá trị (nhà cung cấp & khách hàng sử dụng sản phẩm)."
+      },
+      {
+        id: "FC16", tag: "LO 3e, 4a",
+        front: "Environmental vs. Social Responsibility",
+        back: "• Environmental responsibility (Môi trường): Giảm nước thải sản xuất, đặt mục tiêu phát thải được SBTi xác thực, chuyển đối tác vận tải từ xe diesel sang xe điện, giảm tiêu thụ nước.\n• Social responsibility (Xã hội): Thúc đẩy đa dạng & hòa nhập (diversity & inclusion), thực hành lao động công bằng, loại bỏ lao động trẻ em, cho nhân viên nghỉ có lương đi tình nguyện."
+      },
+      {
+        id: "FC17", tag: "LO 3e, 4a",
+        front: "Sustainable Supply Chains",
+        back: "Chuỗi cung ứng bền vững đòi hỏi mọi mắt xích (nhà cung cấp, nhà phân phối) đều tuân thủ bền vững:\n• Chọn nhà cung cấp có chính sách chống tham nhũng (anti-corruption) công khai.\n• Yêu cầu tuân thủ lao động công bằng (fair labour), nhân quyền, môi trường & giám sát chặt.\n⚠️ Bẫy: Mua từ nhà cung cấp rẻ nhất rồi quyên góp từ thiện, ký thỏa thuận bảo mật (NDA), hay mở rộng quá nhiều nhà cung cấp KHÔNG làm chuỗi cung ứng bền vững hơn."
+      },
+      {
+        id: "FC18", tag: "LO 3e, 4a",
+        front: "Embedding Sustainability into Business Strategy",
+        back: "• Biện pháp TRỰC TIẾP hiệu quả: Gắn mục tiêu hiệu suất bền vững vào cơ cấu lương thưởng lãnh đạo cấp cao (exec pay) + Bắt buộc đào tạo kiến thức bền vững cho toàn thể nhân viên.\n• Bẫy KHÔNG hiệu quả: Ép phòng mua hàng cắt giảm 10% chi phí mỗi năm (dễ chọn nguồn kém bền vững), chỉ chạy chiến dịch truyền thông mạng xã hội mà không hành động, hay cam kết tăng cổ tức ngắn hạn."
+      }
+    ];
+
+    // =========================================================================
+    // 3. LOCALSTORAGE & STATE MANAGEMENT (UNIQUE PREFIX: icaew_c3_)
+    // =========================================================================
+    const KEYS = {
+      cycleNum: "icaew_c3_cycle_num",
+      flagged: "icaew_c3_flagged",
+      history: "icaew_c3_history",
+      flashcards: "icaew_c3_flashcards"
+    };
+
+    let persisted = {
+      cycleNumber: 1,
+      flaggedIds: [],
+      cycleHistory: [],
+      fcStatus: {} // { FC1: 'mastered' | 'review' }
+    };
+
+    let state = {
+      activeTab: "quiz",     // 'quiz' | 'flashcards'
+      quizMode: "practice",  // 'practice' | 'exam'
+      cycleType: "full",     // 'full' | 'review_set' | 'flagged'
+      order: [],
+      currentIndex: 0,
+      answers: {},           // { qId: { selected: [], checked: false, isCorrect: false } }
+      examGraded: false,
+      // Flashcards
+      fcOrder: FLASHCARDS.map(f => f.id),
+      fcFilter: "all",       // 'all' | 'review' | 'mastered'
+      fcIndex: 0,
+      fcFlipped: false
+    };
+
+    function loadPersisted() {
+      try {
+        const cNum = parseInt(localStorage.getItem(KEYS.cycleNum), 10);
+        if (!isNaN(cNum) && cNum >= 1) persisted.cycleNumber = cNum;
+
+        const flagged = JSON.parse(localStorage.getItem(KEYS.flagged) || "[]");
+        if (Array.isArray(flagged)) persisted.flaggedIds = flagged;
+
+        const history = JSON.parse(localStorage.getItem(KEYS.history) || "[]");
+        if (Array.isArray(history)) persisted.cycleHistory = history;
+
+        const fc = JSON.parse(localStorage.getItem(KEYS.flashcards) || "{}");
+        if (fc && typeof fc === "object") persisted.fcStatus = fc;
+      } catch (e) {
+        console.warn("LocalStorage load error:", e);
+      }
+    }
+
+    function savePersisted() {
+      try {
+        localStorage.setItem(KEYS.cycleNum, String(persisted.cycleNumber));
+        localStorage.setItem(KEYS.flagged, JSON.stringify(persisted.flaggedIds));
+        localStorage.setItem(KEYS.history, JSON.stringify(persisted.cycleHistory));
+        localStorage.setItem(KEYS.flashcards, JSON.stringify(persisted.fcStatus));
+      } catch (e) {
+        console.warn("LocalStorage save error:", e);
+      }
+    }
+
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function getQuestionById(id) {
+      return QUESTIONS.find(q => q.id === id);
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      toast.textContent = msg;
+      toast.classList.remove("hidden");
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => toast.classList.add("hidden"), 2400);
+    }
+
+    // =========================================================================
+    // 4. TAB SWITCHING
+    // =========================================================================
+    function switchTab(tab) {
+      state.activeTab = tab;
+      document.getElementById("view-quiz").classList.toggle("hidden", tab !== "quiz");
+      document.getElementById("view-flashcards").classList.toggle("hidden", tab !== "flashcards");
+
+      const btnQuiz = document.getElementById("tab-quiz");
+      const btnFc = document.getElementById("tab-flashcards");
+      if (tab === "quiz") {
+        btnQuiz.className = "flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-white text-emerald-700 shadow-sm";
+        btnFc.className = "flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all text-slate-600 hover:text-slate-900";
+        renderQuiz();
+      } else {
+        btnFc.className = "flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-white text-emerald-700 shadow-sm";
+        btnQuiz.className = "flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all text-slate-600 hover:text-slate-900";
+        renderFlashcard();
+      }
+    }
+
+    function updateFlagCounter() {
+      document.getElementById("header-flag-count").textContent = persisted.flaggedIds.length;
+    }
+
+    // =========================================================================
+    // 5. QUIZ ENGINE (PRACTICE & EXAM MODES)
+    // =========================================================================
+    function startNewCycle(incrementNumber = true, customIds = null, customType = "full") {
+      closeAllModals();
+
+      if (incrementNumber && !customIds) {
+        persisted.cycleNumber += 1;
+        savePersisted();
+      }
+
+      state.cycleType = customIds ? customType : "full";
+      const ids = customIds ? customIds : QUESTIONS.map(q => q.id);
+      state.order = shuffleArray(ids);
+      state.currentIndex = 0;
+      state.answers = {};
+      state.examGraded = false;
+
+      if (state.activeTab !== "quiz") switchTab("quiz");
+      else renderQuiz();
+
+      if (customType === "review_set") {
+        showToast(`Bắt đầu luyện riêng ${ids.length} câu sai & phân vân!`);
+      } else if (customType === "flagged") {
+        showToast(`Bắt đầu luyện ${ids.length} câu Phân vân / Chọn lụi!`);
+      } else {
+        showToast(`Đã xáo trộn chu kỳ #${persisted.cycleNumber} (${ids.length} câu)`);
+      }
+    }
+
+    function setQuizMode(mode) {
+      if (state.quizMode === mode) return;
+      state.quizMode = mode;
+
+      const btnP = document.getElementById("mode-practice");
+      const btnE = document.getElementById("mode-exam");
+      if (mode === "practice") {
+        btnP.className = "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-emerald-600 text-white shadow-sm";
+        btnE.className = "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-600 hover:text-slate-900";
+      } else {
+        btnE.className = "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-emerald-600 text-white shadow-sm";
+        btnP.className = "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-600 hover:text-slate-900";
+      }
+
+      state.answers = {};
+      state.examGraded = false;
+      state.currentIndex = 0;
+      renderQuiz();
+      showToast(mode === "practice" ? "Chế độ Luyện tập: Hiện đáp án ngay" : "Chế độ Kiểm tra: Nộp bài cuối chu kỳ");
+    }
+
+    function checkExactMatch(selected, correct) {
+      if (selected.length !== correct.length) return false;
+      const s = [...selected].sort();
+      const c = [...correct].sort();
+      return s.every((v, i) => v === c[i]);
+    }
+
+    function selectOption(optionKey) {
+      const qId = state.order[state.currentIndex];
+      const q = getQuestionById(qId);
+      const ans = state.answers[qId] || { selected: [], checked: false, isCorrect: false };
+
+      if ((state.quizMode === "practice" && ans.checked) || (state.quizMode === "exam" && state.examGraded)) {
+        return;
+      }
+
+      if (q.type === "single") {
+        ans.selected = [optionKey];
+        if (state.quizMode === "practice") {
+          ans.checked = true;
+          ans.isCorrect = checkExactMatch(ans.selected, q.correct);
+        }
+      } else {
+        if (ans.selected.includes(optionKey)) {
+          ans.selected = ans.selected.filter(k => k !== optionKey);
+        } else {
+          if (ans.selected.length < q.selectCount) {
+            ans.selected.push(optionKey);
+          } else {
+            showToast(`Câu này chỉ chọn tối đa ${q.selectCount} đáp án.`);
+            return;
+          }
+        }
+      }
+
+      state.answers[qId] = ans;
+      renderQuiz();
+    }
+
+    function submitMultiPractice() {
+      const qId = state.order[state.currentIndex];
+      const q = getQuestionById(qId);
+      const ans = state.answers[qId];
+      if (!ans || ans.selected.length === 0) {
+        showToast(`Hãy chọn ${q.selectCount} đáp án trước khi kiểm tra.`);
+        return;
+      }
+      ans.checked = true;
+      ans.isCorrect = checkExactMatch(ans.selected, q.correct);
+      state.answers[qId] = ans;
+      renderQuiz();
+    }
+
+    function toggleFlagCurrent() {
+      const qId = state.order[state.currentIndex];
+      if (persisted.flaggedIds.includes(qId)) {
+        persisted.flaggedIds = persisted.flaggedIds.filter(id => id !== qId);
+        showToast(`Đã bỏ đánh dấu ${qId}`);
+      } else {
+        persisted.flaggedIds.push(qId);
+        showToast(`Đã đánh dấu ${qId} (Phân vân / Chọn lụi)`);
+      }
+      savePersisted();
+      updateFlagCounter();
+      renderQuiz();
+    }
+
+    function prevQuestion() {
+      if (state.currentIndex > 0) {
+        state.currentIndex--;
+        renderQuiz();
+      }
+    }
+
+    function nextQuestion() {
+      if (state.currentIndex < state.order.length - 1) {
+        state.currentIndex++;
+        renderQuiz();
+      } else {
+        finishCycle();
+      }
+    }
+
+    function jumpToQuestion(idx) {
+      state.currentIndex = idx;
+      closeNavigatorDrawer();
+      renderQuiz();
+    }
+
+    function finishCycle() {
+      const total = state.order.length;
+      let correctCount = 0;
+      let wrongCount = 0;
+      let flaggedInCycle = 0;
+
+      state.order.forEach(qId => {
+        const q = getQuestionById(qId);
+        const ans = state.answers[qId] || { selected: [], checked: false, isCorrect: false };
+        ans.checked = true;
+        ans.isCorrect = checkExactMatch(ans.selected, q.correct);
+        state.answers[qId] = ans;
+
+        if (ans.isCorrect) correctCount++;
+        else wrongCount++;
+
+        if (persisted.flaggedIds.includes(qId)) flaggedInCycle++;
+      });
+
+      const alreadyGraded = state.examGraded;
+      state.examGraded = true;
+
+      const accuracyRate = Math.round((correctCount / total) * 100);
+      const errorRate = Math.round((wrongCount / total) * 100);
+
+      if (!alreadyGraded) {
+        const labelMap = {
+          full: `Chu kỳ #${persisted.cycleNumber}`,
+          review_set: `Ôn sai & phân vân (${total} câu)`,
+          flagged: `Ôn phân vân (${total} câu)`
+        };
+        persisted.cycleHistory.unshift({
+          cycle: labelMap[state.cycleType],
+          date: new Date().toLocaleString("vi-VN", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }),
+          mode: state.quizMode === "practice" ? "Luyện tập" : "Kiểm tra",
+          total,
+          correct: correctCount,
+          wrong: wrongCount,
+          errorRate,
+          flagged: flaggedInCycle
+        });
+        if (persisted.cycleHistory.length > 25) persisted.cycleHistory.pop();
+        savePersisted();
+      }
+
+      document.getElementById("modal-cycle-subtitle").textContent =
+        `${state.cycleType === "full" ? "Chu kỳ #" + persisted.cycleNumber : "Phiên ôn tập trung"} • ${state.quizMode === "practice" ? "Luyện tập" : "Kiểm tra"} (${total} câu)`;
+      document.getElementById("modal-correct").textContent = `${correctCount}/${total} (${accuracyRate}%)`;
+      document.getElementById("modal-wrong").textContent = wrongCount;
+      document.getElementById("modal-error-rate").textContent = `${errorRate}%`;
+      document.getElementById("modal-flagged").textContent = flaggedInCycle;
+
+      const wrongIds = state.order.filter(id => !state.answers[id]?.isCorrect);
+      const combinedSet = Array.from(new Set([...wrongIds, ...persisted.flaggedIds]));
+      const reviewBtn = document.getElementById("modal-btn-wrong-and-flagged");
+      reviewBtn.classList.toggle("hidden", combinedSet.length === 0);
+      reviewBtn.textContent = `Luyện riêng câu sai & phân vân (${combinedSet.length} câu)`;
+
+      const preview = document.getElementById("modal-history-preview");
+      const recent = persisted.cycleHistory.slice(0, 4);
+      preview.innerHTML = `
+        <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">Lịch sử chu kỳ gần đây</p>
+        <div class="space-y-1.5 text-xs">
+          ${recent.map(h => `
+            <div class="flex items-center justify-between">
+              <span class="font-semibold text-slate-700">${h.cycle} <span class="text-slate-400 font-normal">(${h.date})</span></span>
+              <span class="font-bold ${h.errorRate > 25 ? 'text-rose-600' : 'text-emerald-600'}">Sai ${h.errorRate}% (${h.correct}/${h.total})</span>
+            </div>
+          `).join("")}
+        </div>
+      `;
+
+      renderQuiz();
+      openSummaryModal();
+    }
+
+    function startWrongAndFlaggedCycle() {
+      const wrongIds = state.order.filter(qId => {
+        const a = state.answers[qId];
+        return !a || !a.isCorrect;
+      });
+      const combined = Array.from(new Set([...wrongIds, ...persisted.flaggedIds]));
+      if (combined.length === 0) {
+        showToast("Không có câu sai hoặc câu phân vân nào!");
+        return;
+      }
+      startNewCycle(false, combined, "review_set");
+    }
+
+    function startFlaggedOnlyCycle() {
+      if (persisted.flaggedIds.length === 0) {
+        showToast("Bạn chưa đánh dấu câu Phân vân / Chọn lụi nào.");
+        return;
+      }
+      startNewCycle(false, [...persisted.flaggedIds], "flagged");
+    }
+
+    function renderQuiz() {
+      const total = state.order.length;
+      const qId = state.order[state.currentIndex];
+      const q = getQuestionById(qId);
+      const ans = state.answers[qId] || { selected: [], checked: false, isCorrect: false };
+      const isFlagged = persisted.flaggedIds.includes(qId);
+      const showFeedback = (state.quizMode === "practice" && ans.checked) || (state.quizMode === "exam" && state.examGraded);
+
+      // Cycle Badge
+      const cycleLabel = state.cycleType === "full"
+        ? `Chu kỳ #${persisted.cycleNumber} (${total} câu)`
+        : state.cycleType === "review_set"
+          ? `Ôn sai & phân vân (${total} câu)`
+          : `Ôn phân vân (${total} câu)`;
+      document.getElementById("cycle-badge").textContent = cycleLabel;
+
+      document.getElementById("btn-submit-exam").classList.toggle("hidden", !(state.quizMode === "exam" && !state.examGraded));
+
+      // Exam Graded Banner
+      const banner = document.getElementById("exam-review-banner");
+      if (state.quizMode === "exam" && state.examGraded) {
+        const correctCount = state.order.filter(id => state.answers[id]?.isCorrect).length;
+        const acc = Math.round((correctCount / total) * 100);
+        document.getElementById("exam-review-stats").textContent = `Đúng ${correctCount}/${total} câu (${acc}%) • Tỷ lệ sai: ${100 - acc}%`;
+        banner.classList.remove("hidden");
+      } else {
+        banner.classList.add("hidden");
+      }
+
+      // Progress & Live Stats
+      const answeredCount = state.order.filter(id => {
+        const a = state.answers[id];
+        if (!a) return false;
+        return state.quizMode === "practice" ? a.checked : a.selected.length > 0;
+      }).length;
+      const pct = Math.round((answeredCount / total) * 100);
+      document.getElementById("progress-text").textContent = `${answeredCount} / ${total} câu (${pct}%)`;
+      document.getElementById("progress-bar").style.width = `${pct}%`;
+
+      const correctBadge = document.getElementById("live-correct-badge");
+      const wrongBadge = document.getElementById("live-wrong-badge");
+      if ((state.quizMode === "practice" && answeredCount > 0) || state.examGraded) {
+        const checkedIds = state.order.filter(id => state.answers[id]?.checked);
+        const correctSoFar = checkedIds.filter(id => state.answers[id].isCorrect).length;
+        const wrongSoFar = checkedIds.length - correctSoFar;
+        const errPct = checkedIds.length > 0 ? Math.round((wrongSoFar / checkedIds.length) * 100) : 0;
+
+        correctBadge.textContent = `Đúng: ${correctSoFar}`;
+        wrongBadge.textContent = `Sai: ${wrongSoFar} (${errPct}%)`;
+        correctBadge.classList.remove("hidden");
+        wrongBadge.classList.remove("hidden");
+      } else {
+        correctBadge.classList.add("hidden");
+        wrongBadge.classList.add("hidden");
+      }
+
+      // Card Meta
+      document.getElementById("q-position").textContent = `Câu ${state.currentIndex + 1} / ${total}`;
+      document.getElementById("q-original-id").textContent = q.id;
+      document.getElementById("q-lo-badge").textContent = q.lo;
+
+      const typeBadge = document.getElementById("q-type-badge");
+      if (q.type === "multi") {
+        typeBadge.className = "px-2.5 py-1 rounded-full bg-teal-50 text-teal-700 text-xs font-bold border border-teal-200";
+        typeBadge.textContent = `Chọn ${q.selectCount} đáp án`;
+      } else {
+        typeBadge.className = "px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-semibold";
+        typeBadge.textContent = "Chọn 1 đáp án";
+      }
+
+      // Flag Button Styling
+      const btnFlag = document.getElementById("btn-flag");
+      const btnFlagText = document.getElementById("btn-flag-text");
+      if (isFlagged) {
+        btnFlag.className = "flex items-center gap-1.5 px-3.5 py-2 rounded-xl border text-xs font-semibold transition-all bg-amber-100 border-amber-300 text-amber-900 shadow-xs";
+        btnFlagText.textContent = "Đã đánh dấu phân vân";
+      } else {
+        btnFlag.className = "flex items-center gap-1.5 px-3.5 py-2 rounded-xl border text-xs font-semibold transition-all bg-white border-slate-200 text-slate-600 hover:bg-slate-50";
+        btnFlagText.textContent = "Phân vân / Chọn lụi";
+      }
+
+      // Context & Question Text
+      const ctxWrap = document.getElementById("q-context-wrap");
+      if (q.context && q.context.trim().length > 0) {
+        ctxWrap.classList.remove("hidden");
+        document.getElementById("q-context").textContent = q.context;
+      } else {
+        ctxWrap.classList.add("hidden");
+      }
+      document.getElementById("q-text").textContent = q.question;
+
+      // Options Rendering
+      const optionsEl = document.getElementById("q-options");
+      optionsEl.innerHTML = "";
+      q.options.forEach(opt => {
+        const isSelected = ans.selected.includes(opt.key);
+        const isCorrectOpt = q.correct.includes(opt.key);
+
+        let btnClasses = "w-full text-left p-3.5 sm:p-4 rounded-2xl border-2 transition-all flex items-start gap-3 ";
+        let badgeClasses = "w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 ";
+
+        if (showFeedback) {
+          if (isCorrectOpt) {
+            btnClasses += "bg-emerald-50 border-emerald-500 text-emerald-950";
+            badgeClasses += "bg-emerald-600 text-white";
+          } else if (isSelected && !isCorrectOpt) {
+            btnClasses += "bg-rose-50 border-rose-400 text-rose-950";
+            badgeClasses += "bg-rose-500 text-white";
+          } else {
+            btnClasses += "bg-slate-50/70 border-slate-100 text-slate-400";
+            badgeClasses += "bg-slate-200 text-slate-500";
+          }
+        } else {
+          if (isSelected) {
+            btnClasses += "bg-teal-50 border-teal-500 text-teal-950 shadow-xs";
+            badgeClasses += "bg-teal-600 text-white";
+          } else {
+            btnClasses += "bg-white border-slate-200 hover:border-emerald-300 hover:bg-slate-50 text-slate-800";
+            badgeClasses += "bg-slate-100 text-slate-600";
+          }
+        }
+
+        const btn = document.createElement("button");
+        btn.className = btnClasses;
+        btn.onclick = () => selectOption(opt.key);
+        btn.innerHTML = `
+          <span class="${badgeClasses}">${opt.key}</span>
+          <span class="text-sm sm:text-[15px] leading-snug font-medium flex-1">${opt.text}</span>
+          ${showFeedback && isCorrectOpt ? '<span class="text-emerald-600 font-bold text-sm shrink-0">✓</span>' : ''}
+          ${showFeedback && isSelected && !isCorrectOpt ? '<span class="text-rose-500 font-bold text-sm shrink-0">✕</span>' : ''}
+        `;
+        optionsEl.appendChild(btn);
+      });
+
+      // Multi-choice Check Button
+      document.getElementById("multi-check-wrap").classList.toggle("hidden", !(q.type === "multi" && state.quizMode === "practice" && !ans.checked));
+
+      // Explanation Box
+      const expBox = document.getElementById("explanation-box");
+      if (showFeedback) {
+        expBox.classList.remove("hidden");
+        const statusBadge = document.getElementById("exp-status-badge");
+        if (ans.isCorrect) {
+          expBox.className = "mt-6 p-4 sm:p-5 rounded-2xl border bg-emerald-50/70 border-emerald-200";
+          statusBadge.className = "px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-600 text-white";
+          statusBadge.textContent = "Chính xác!";
+        } else {
+          expBox.className = "mt-6 p-4 sm:p-5 rounded-2xl border bg-rose-50/70 border-rose-200";
+          statusBadge.className = "px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-600 text-white";
+          statusBadge.textContent = "Chưa đúng";
+        }
+        document.getElementById("exp-lo-tag").textContent = q.lo;
+        document.getElementById("exp-correct-answer").textContent = `Đáp án đúng: ${q.correct.join(", ")}`;
+        document.getElementById("exp-text").textContent = q.explanation;
+      } else {
+        expBox.classList.add("hidden");
+      }
+
+      // Prev / Next Buttons
+      document.getElementById("btn-prev").disabled = state.currentIndex === 0;
+      document.getElementById("btn-next").textContent = state.currentIndex === total - 1
+        ? (state.examGraded ? "Xem tổng kết" : (state.quizMode === "exam" ? "Nộp bài & Chấm điểm ✓" : "Hoàn thành chu kỳ ✓"))
+        : "Câu tiếp →";
+    }
+
+    // =========================================================================
+    // 6. MODALS & DRAWERS (NAVIGATOR, FLAGGED, HISTORY, SUMMARY)
+    // =========================================================================
+    function openNavigatorDrawer() {
+      const grid = document.getElementById("nav-grid");
+      grid.innerHTML = "";
+      document.getElementById("nav-modal-subtitle").textContent = `Đang ở câu ${state.currentIndex + 1} / ${state.order.length}`;
+
+      state.order.forEach((id, idx) => {
+        const a = state.answers[id];
+        const flagged = persisted.flaggedIds.includes(id);
+        let cls = "h-10 rounded-xl text-xs font-bold transition-all relative flex items-center justify-center border ";
+        if (idx === state.currentIndex) cls += "ring-2 ring-slate-900 ring-offset-1 ";
+
+        if (a && (state.quizMode === "practice" ? a.checked : state.examGraded)) {
+          cls += a.isCorrect ? "bg-emerald-500 text-white border-emerald-600" : "bg-rose-500 text-white border-rose-600";
+        } else if (a && a.selected.length > 0) {
+          cls += "bg-teal-500 text-white border-teal-600";
+        } else {
+          cls += "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100";
+        }
+
+        const btn = document.createElement("button");
+        btn.className = cls;
+        btn.onclick = () => jumpToQuestion(idx);
+        btn.innerHTML = `${idx + 1}${flagged ? '<span class="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-amber-400 border-2 border-white"></span>' : ''}`;
+        grid.appendChild(btn);
+      });
+
+      document.getElementById("navigator-modal").classList.remove("hidden");
+    }
+
+    function closeNavigatorDrawer() { document.getElementById("navigator-modal").classList.add("hidden"); }
+
+    function openFlaggedDrawer() {
+      const count = persisted.flaggedIds.length;
+      document.getElementById("flagged-modal-count").textContent = `${count} câu đã đánh dấu`;
+      document.getElementById("btn-practice-flagged-modal").disabled = count === 0;
+
+      const listEl = document.getElementById("flagged-modal-list");
+      if (count === 0) {
+        listEl.innerHTML = `<p class="text-sm text-slate-400 italic py-8 text-center">Chưa có câu nào được đánh dấu Phân vân / Chọn lụi.</p>`;
+      } else {
+        listEl.innerHTML = persisted.flaggedIds.map(id => {
+          const q = getQuestionById(id);
+          if (!q) return "";
+          return `
+            <div class="p-4 rounded-2xl border border-amber-200 bg-amber-50/40 flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+              <div class="space-y-1">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="px-2 py-0.5 rounded-md bg-slate-900 text-white text-[11px] font-bold">${q.id}</span>
+                  <span class="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[11px] font-semibold">${q.lo}</span>
+                  <span class="text-xs font-bold text-emerald-700">Đáp án: ${q.correct.join(", ")}</span>
+                </div>
+                <p class="text-sm font-semibold text-slate-900">${q.question}</p>
+                <p class="text-xs text-slate-600 leading-relaxed">${q.explanation}</p>
+              </div>
+              <button onclick="removeFlagged('${q.id}')" class="px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-xs font-semibold text-slate-600 shrink-0">
+                Bỏ đánh dấu
+              </button>
+            </div>
+          `;
+        }).join("");
+      }
+
+      document.getElementById("flagged-modal").classList.remove("hidden");
+    }
+
+    function closeFlaggedDrawer() { document.getElementById("flagged-modal").classList.add("hidden"); }
+
+    function removeFlagged(qId) {
+      persisted.flaggedIds = persisted.flaggedIds.filter(id => id !== qId);
+      savePersisted();
+      updateFlagCounter();
+      openFlaggedDrawer();
+      renderQuiz();
+    }
+
+    function openHistoryModal() {
+      const body = document.getElementById("history-modal-body");
+      if (persisted.cycleHistory.length === 0) {
+        body.innerHTML = `<p class="text-sm text-slate-400 italic py-8 text-center">Chưa có chu kỳ nào hoàn thành. Hãy hoàn thành 1 chu kỳ để theo dõi tỷ lệ sai.</p>`;
+      } else {
+        body.innerHTML = `
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs sm:text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500">
+                  <th class="py-2.5 pr-3 font-semibold">Chu kỳ</th>
+                  <th class="py-2.5 px-3 font-semibold">Thời gian</th>
+                  <th class="py-2.5 px-3 font-semibold">Chế độ</th>
+                  <th class="py-2.5 px-3 font-semibold">Đúng</th>
+                  <th class="py-2.5 px-3 font-semibold">Tỷ lệ sai</th>
+                  <th class="py-2.5 pl-3 font-semibold">Phân vân</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                ${persisted.cycleHistory.map(h => `
+                  <tr>
+                    <td class="py-2.5 pr-3 font-bold text-slate-800">${h.cycle}</td>
+                    <td class="py-2.5 px-3 text-slate-500">${h.date}</td>
+                    <td class="py-2.5 px-3 text-slate-600">${h.mode}</td>
+                    <td class="py-2.5 px-3 font-semibold text-emerald-700">${h.correct}/${h.total}</td>
+                    <td class="py-2.5 px-3 font-bold ${h.errorRate > 25 ? 'text-rose-600' : 'text-emerald-600'}">${h.errorRate}%</td>
+                    <td class="py-2.5 pl-3 text-amber-700 font-semibold">${h.flagged}</td>
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+      cancelResetConfirm();
+      document.getElementById("history-modal").classList.remove("hidden");
+    }
+
+    function closeHistoryModal() { document.getElementById("history-modal").classList.add("hidden"); }
+
+    function showResetConfirm() {
+      document.getElementById("reset-confirm-area").innerHTML = `
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-slate-600">Xác nhận xóa hết dữ liệu C3?</span>
+          <button onclick="confirmResetAll()" class="px-2.5 py-1 rounded-lg bg-rose-600 text-white text-xs font-semibold">Xóa</button>
+          <button onclick="cancelResetConfirm()" class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 text-xs font-semibold">Hủy</button>
+        </div>
+      `;
+    }
+
+    function cancelResetConfirm() {
+      const area = document.getElementById("reset-confirm-area");
+      if (area) {
+        area.innerHTML = `
+          <button onclick="showResetConfirm()" class="text-xs font-semibold text-rose-600 hover:text-rose-800 underline">
+            Đặt lại toàn bộ dữ liệu Chapter 3
+          </button>
+        `;
+      }
+    }
+
+    function confirmResetAll() {
+      persisted = { cycleNumber: 1, flaggedIds: [], cycleHistory: [], fcStatus: {} };
+      savePersisted();
+      updateFlagCounter();
+      closeHistoryModal();
+      startNewCycle(false);
+      renderFlashcard();
+      showToast("Đã đặt lại toàn bộ dữ liệu Chapter 3.");
+    }
+
+    function openSummaryModal() { document.getElementById("summary-modal").classList.remove("hidden"); }
+    function closeSummaryModal() { document.getElementById("summary-modal").classList.add("hidden"); }
+    function closeAllModals() {
+      closeSummaryModal();
+      closeNavigatorDrawer();
+      closeFlaggedDrawer();
+      closeHistoryModal();
+    }
+
+    // =========================================================================
+    // 7. FLASHCARDS ENGINE (18 CARDS, 3 FILTERS)
+    // =========================================================================
+    function getActiveFlashcardIds() {
+      if (state.fcFilter === "review") {
+        return state.fcOrder.filter(id => persisted.fcStatus[id] !== "mastered");
+      }
+      if (state.fcFilter === "mastered") {
+        return state.fcOrder.filter(id => persisted.fcStatus[id] === "mastered");
+      }
+      return state.fcOrder;
+    }
+
+    function setFlashcardFilter(filter) {
+      state.fcFilter = filter;
+      state.fcIndex = 0;
+      state.fcFlipped = false;
+
+      ["all", "review", "mastered"].forEach(f => {
+        const btn = document.getElementById(`fc-filter-${f}`);
+        if (f === filter) {
+          btn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-emerald-700 shadow-sm";
+        } else {
+          btn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600";
+        }
+      });
+      renderFlashcard();
+    }
+
+    function shuffleFlashcards() {
+      state.fcOrder = shuffleArray(state.fcOrder);
+      state.fcIndex = 0;
+      state.fcFlipped = false;
+      renderFlashcard();
+      showToast("Đã xáo trộn 18 thẻ Flashcards!");
+    }
+
+    function flipFlashcard() {
+      state.fcFlipped = !state.fcFlipped;
+      document.getElementById("fc-card").classList.toggle("rotate-y-180", state.fcFlipped);
+    }
+
+    function markFlashcard(status) {
+      const list = getActiveFlashcardIds();
+      if (list.length === 0) return;
+
+      const fcId = list[state.fcIndex];
+      persisted.fcStatus[fcId] = status;
+      savePersisted();
+
+      showToast(status === "mastered" ? "Đã đánh dấu: Đã nhớ ✓" : "Đã đánh dấu: Cần ôn lại");
+      state.fcFlipped = false;
+
+      const nextList = getActiveFlashcardIds();
+      if (state.fcIndex >= nextList.length) {
+        state.fcIndex = Math.max(0, nextList.length - 1);
+      } else if (state.fcFilter === "all" && state.fcIndex < nextList.length - 1) {
+        state.fcIndex++;
+      }
+      renderFlashcard();
+    }
+
+    function prevFlashcard() {
+      const list = getActiveFlashcardIds();
+      if (list.length === 0) return;
+      state.fcIndex = (state.fcIndex - 1 + list.length) % list.length;
+      state.fcFlipped = false;
+      renderFlashcard();
+    }
+
+    function nextFlashcard() {
+      const list = getActiveFlashcardIds();
+      if (list.length === 0) return;
+      state.fcIndex = (state.fcIndex + 1) % list.length;
+      state.fcFlipped = false;
+      renderFlashcard();
+    }
+
+    function renderFlashcard() {
+      const totalAll = FLASHCARDS.length;
+      const masteredCount = FLASHCARDS.filter(f => persisted.fcStatus[f.id] === "mastered").length;
+      const reviewCount = totalAll - masteredCount;
+      const pct = Math.round((masteredCount / totalAll) * 100);
+
+      document.getElementById("fc-total-count").textContent = totalAll;
+      document.getElementById("fc-review-count").textContent = reviewCount;
+      document.getElementById("fc-mastered-count").textContent = masteredCount;
+      document.getElementById("fc-mastered-stats").textContent = `Đã nhớ: ${masteredCount} / ${totalAll} (${pct}%)`;
+      document.getElementById("fc-progress-bar").style.width = `${pct}%`;
+
+      const list = getActiveFlashcardIds();
+      document.getElementById("fc-card").classList.toggle("rotate-y-180", state.fcFlipped);
+
+      if (list.length === 0) {
+        document.getElementById("fc-position").textContent = "0 / 0";
+        document.getElementById("fc-front-tag").textContent = "Chapter 3";
+        document.getElementById("fc-status-pill").className = "px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600";
+        document.getElementById("fc-status-pill").textContent = "Danh sách trống";
+        document.getElementById("fc-front-text").textContent = state.fcFilter === "mastered"
+          ? "Bạn chưa đánh dấu thẻ nào là 'Đã nhớ'."
+          : "Tuyệt vời! Bạn đã nhớ toàn bộ 18 Flashcards Chapter 3.";
+        document.getElementById("fc-back-text").textContent = "Chuyển bộ lọc sang 'Tất cả' để ôn lại từ đầu.";
+        document.getElementById("fc-back-tag").textContent = "";
+        return;
+      }
+
+      if (state.fcIndex >= list.length) state.fcIndex = 0;
+      const fc = FLASHCARDS.find(f => f.id === list[state.fcIndex]);
+      const status = persisted.fcStatus[fc.id];
+
+      document.getElementById("fc-position").textContent = `Thẻ ${state.fcIndex + 1} / ${list.length}`;
+      document.getElementById("fc-front-tag").textContent = `${fc.id} • ${fc.tag}`;
+      document.getElementById("fc-back-tag").textContent = fc.tag;
+      document.getElementById("fc-front-text").textContent = fc.front;
+      document.getElementById("fc-back-text").textContent = fc.back;
+
+      const pill = document.getElementById("fc-status-pill");
+      if (status === "mastered") {
+        pill.className = "px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700";
+        pill.textContent = "✓ Đã nhớ";
+      } else if (status === "review") {
+        pill.className = "px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-900";
+        pill.textContent = "Cần ôn lại";
+      } else {
+        pill.className = "px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-500";
+        pill.textContent = "Chưa đánh giá";
+      }
+    }
+
+    // =========================================================================
+    // 8. KEYBOARD SHORTCUTS & INITIALIZATION
+    // =========================================================================
+    document.addEventListener("keydown", (e) => {
+      const anyModalOpen =
+        !document.getElementById("summary-modal").classList.contains("hidden") ||
+        !document.getElementById("navigator-modal").classList.contains("hidden") ||
+        !document.getElementById("flagged-modal").classList.contains("hidden") ||
+        !document.getElementById("history-modal").classList.contains("hidden");
+
+      if (anyModalOpen) {
+        if (e.key === "Escape") closeAllModals();
+        return;
+      }
+
+      if (state.activeTab === "quiz") {
+        if (e.key === "ArrowLeft") prevQuestion();
+        if (e.key === "ArrowRight") nextQuestion();
+      } else if (state.activeTab === "flashcards") {
+        if (e.code === "Space") {
+          e.preventDefault();
+          flipFlashcard();
+        } else if (e.key === "ArrowLeft") {
+          prevFlashcard();
+        } else if (e.key === "ArrowRight") {
+          nextFlashcard();
+        }
+      }
+    });
+
+    // Boot App
+    loadPersisted();
+    state.order = shuffleArray(QUESTIONS.map(q => q.id));
+    updateFlagCounter();
+    renderQuiz();
+  </script>
+</body>
+</html>
